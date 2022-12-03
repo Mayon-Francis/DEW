@@ -2,13 +2,14 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Web3Auth } from "@web3auth/web3auth";
 import { CHAIN_NAMESPACES } from "@web3auth/base";
 import { CoinbaseAdapter } from "@web3auth/coinbase-adapter";
-import { ethers } from "ethers";
+import { ethers, Signer } from "ethers";
 import { activeChainId, getRPCProvider } from "../utils/chainConfig";
 
 interface web3AuthContextType {
   connectWeb3: () => Promise<void>;
   disconnect: () => Promise<void>;
   provider: any;
+  signer:any,
   ethersProvider: ethers.providers.Web3Provider | null;
   web3Provider: ethers.providers.Web3Provider | null;
   loading: boolean;
@@ -20,6 +21,7 @@ export const Web3AuthContext = React.createContext<web3AuthContextType>({
   connectWeb3: () => Promise.resolve(),
   disconnect: () => Promise.resolve(),
   loading: false,
+  signer:null,
   provider: null,
   ethersProvider: null,
   web3Provider: null,
@@ -48,6 +50,7 @@ web3auth.initModal();
 
 type StateType = {
   provider?: any;
+  signer?: any;
   web3Provider?: ethers.providers.Web3Provider | null;
   ethersProvider?: ethers.providers.Web3Provider | null;
   address?: string;
@@ -63,7 +66,7 @@ const initialState: StateType = {
 
 export const Web3AuthProvider = ({ children }: any) => {
   const [web3State, setWeb3State] = useState<StateType>(initialState);
-  const { provider, web3Provider, ethersProvider, address, chainId } =
+  const { provider, web3Provider, ethersProvider, address, chainId, signer } =
     web3State;
   const [loading, setLoading] = useState(true);
 
@@ -83,6 +86,7 @@ export const Web3AuthProvider = ({ children }: any) => {
         web3Provider: web3Provider,
         ethersProvider: web3Provider,
         address: gotAccount,
+        signer:signer,
         chainId: Number(network.chainId),
       });
       setLoading(false);
@@ -101,6 +105,7 @@ export const Web3AuthProvider = ({ children }: any) => {
       web3Provider: null,
       ethersProvider: null,
       address: "",
+      signer:null,
       chainId: activeChainId,
     });
   }, []);
@@ -155,6 +160,7 @@ export const Web3AuthProvider = ({ children }: any) => {
         connectWeb3,
         disconnect,
         loading,
+        signer:signer,
         provider: provider,
         ethersProvider: ethersProvider || null,
         web3Provider: web3Provider || null,
