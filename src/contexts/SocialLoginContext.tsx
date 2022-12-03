@@ -1,28 +1,43 @@
-
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { ethers } from "ethers";
-import SocialLogin, { getSocialLoginSDK } from "@biconomy/web3-auth";
+import SocialLogin from "@biconomy/web3-auth";
 import { activeChainId } from "../utils/chainConfig";
 
-
-export const Web3AuthContext = React.createContext({
+interface web3AuthContextType {
+  connect: () => Promise<SocialLogin | null | undefined>;
+  disconnect: () => Promise<void>;
+  provider: any;
+  ethersProvider: ethers.providers.Web3Provider | null;
+  web3Provider: ethers.providers.Web3Provider | null;
+  loading: boolean;
+  chainId: number;
+  address: string;
+}
+export const Web3AuthContext = React.createContext<web3AuthContextType>({
   connect: () => Promise.resolve(null),
   disconnect: () => Promise.resolve(),
-  getUserInfo: () => Promise.resolve(),
   loading: false,
   provider: null,
   ethersProvider: null,
   web3Provider: null,
   chainId: activeChainId,
   address: "",
-  userInfo: null,
 });
 export const useWeb3AuthContext = () => useContext(Web3AuthContext);
 
+export enum SignTypeMethod {
+  PERSONAL_SIGN = "PERSONAL_SIGN",
+  EIP712_SIGN = "EIP712_SIGN",
+}
 
-
-
-const initialState = {
+type StateType = {
+  provider?: any;
+  web3Provider?: ethers.providers.Web3Provider | null;
+  ethersProvider?: ethers.providers.Web3Provider | null;
+  address?: string;
+  chainId?: number;
+};
+const initialState: StateType = {
   provider: null,
   web3Provider: null,
   ethersProvider: null,
@@ -30,7 +45,7 @@ const initialState = {
   chainId: activeChainId,
 };
 
-export const Web3AuthProvider = ({ children }) => {
+export const Web3AuthProvider = ({ children }: any) => {
   const [web3State, setWeb3State] = useState<StateType>(initialState);
   const { provider, web3Provider, ethersProvider, address, chainId } =
     web3State;
@@ -38,12 +53,29 @@ export const Web3AuthProvider = ({ children }) => {
   const [socialLoginSDK, setSocialLoginSDK] = useState<SocialLogin | null>(
     null
   );
-  const [userInfo, setUserInfo] = useState<any>(null);
+
+  // create socialLoginSDK and call the init
+  useEffect(() => {
+    const initWallet = async () => {
+      const sdk = new SocialLogin();
+      await sdk.init(ethers.utils.hexValue(80001), {
+        "https://sdk-staging.biconomy.io":
+          "MEQCIBgO86Ds-nQ6JLHWmo5umziadaY-VDCQxLmwy-DX6nCxAiBJPnc0SOZmFTkphRfS7yd81DsC--Uj6Vb-WqvfSXngnQ",
+        "http://sdk-staging.biconomy.io":
+          "MEUCIQDW2lTR5y_sTv3UTJEhfnC3_cLDb_aBrWtev8Ih4kXG4QIgIMjQhpQs9g14c3t64bEt3mQMMPuWHrbLBfo7hRAGEZc",
+        // "http://localhost:3000":
+        //   "MEUCIQDCrwqCFSAoivC8NfJdHv9WneLfdMADQCUitF6zs2QCagIgOdh3_6dZ81Le1PFzNfDLSImuugEb46Tz64SjOcQWcZA",
+      });
+      sdk.showConnectModal();
+      setSocialLoginSDK(sdk);
+    };
+    if (!socialLoginSDK) initWallet();
+  }, [socialLoginSDK]);
 
   // if wallet already connected close widget
   useEffect(() => {
     console.log("hidelwallet");
-    if (socialLoginSDK && socialLoginSDK.provider) {
+    if (socialLoginSDK && address) {
       socialLoginSDK.hideWallet();
     }
   }, [address, socialLoginSDK]);
@@ -66,7 +98,7 @@ export const Web3AuthProvider = ({ children }) => {
         address: gotAccount,
         chainId: Number(network.chainId),
       });
-      setLoading(false)
+      setLoading(false);
       return;
     }
     if (socialLoginSDK) {
@@ -74,7 +106,17 @@ export const Web3AuthProvider = ({ children }) => {
       return socialLoginSDK;
     }
     setLoading(true);
-    const sdk = await getSocialLoginSDK();
+    const sdk = new SocialLogin();
+    // const proof = await sdk.whitelistUrl("", "http://sdk-staging.biconomy.io");
+    // console.log("proof", proof);
+    await sdk.init(ethers.utils.hexValue(80001), {
+      "https://sdk-staging.biconomy.io":
+        "MEQCIBgO86Ds-nQ6JLHWmo5umziadaY-VDCQxLmwy-DX6nCxAiBJPnc0SOZmFTkphRfS7yd81DsC--Uj6Vb-WqvfSXngnQ",
+      "http://sdk-staging.biconomy.io":
+        "MEUCIQDW2lTR5y_sTv3UTJEhfnC3_cLDb_aBrWtev8Ih4kXG4QIgIMjQhpQs9g14c3t64bEt3mQMMPuWHrbLBfo7hRAGEZc",
+      // "http://localhost:3000":
+      //   "MEUCIQDCrwqCFSAoivC8NfJdHv9WneLfdMADQCUitF6zs2QCagIgOdh3_6dZ81Le1PFzNfDLSImuugEb46Tz64SjOcQWcZA",
+    });
     sdk.showConnectModal();
     sdk.showWallet();
     setSocialLoginSDK(sdk);
@@ -82,13 +124,14 @@ export const Web3AuthProvider = ({ children }) => {
     return socialLoginSDK;
   }, [address, socialLoginSDK]);
 
-  const getUserInfo = useCallback(async () => {
-    if (socialLoginSDK) {
-      const userInfo = await socialLoginSDK.getUserInfo();
-      console.log("userInfo", userInfo);
-      setUserInfo(userInfo);
-    }
-  }, [socialLoginSDK]);
+  // after social login -> set provider info
+  useEffect(() => {
+    (async () => {
+      if (socialLoginSDK?.provider && !address) {
+        connect();
+      }
+    })();
+  }, [address, connect, socialLoginSDK, socialLoginSDK?.provider]);
 
   // after metamask login -> get provider event
   useEffect(() => {
@@ -118,10 +161,7 @@ export const Web3AuthProvider = ({ children }) => {
       address: "",
       chainId: activeChainId,
     });
-    setUserInfo(null);
-    (window).getSocialLoginSDK = null;
     socialLoginSDK.hideWallet();
-    setSocialLoginSDK(null);
   }, [socialLoginSDK]);
 
   return (
@@ -129,14 +169,12 @@ export const Web3AuthProvider = ({ children }) => {
       value={{
         connect,
         disconnect,
-        getUserInfo,
         loading,
         provider: provider,
         ethersProvider: ethersProvider || null,
         web3Provider: web3Provider || null,
         chainId: chainId || 0,
         address: address || "",
-        userInfo,
       }}
     >
       {children}
