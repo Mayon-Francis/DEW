@@ -3,10 +3,12 @@ import { ethers } from "ethers";
 import SocialLogin from "@biconomy/web3-auth";
 import { activeChainId } from "../utils/chainConfig";
 
+
 interface web3AuthContextType {
   connect: () => Promise<SocialLogin | null | undefined>;
   disconnect: () => Promise<void>;
   provider: any;
+  signer:any;
   ethersProvider: ethers.providers.Web3Provider | null;
   web3Provider: ethers.providers.Web3Provider | null;
   loading: boolean;
@@ -17,6 +19,7 @@ export const Web3AuthContext = React.createContext<web3AuthContextType>({
   connect: () => Promise.resolve(null),
   disconnect: () => Promise.resolve(),
   loading: false,
+  signer:null,
   provider: null,
   ethersProvider: null,
   web3Provider: null,
@@ -32,6 +35,7 @@ export enum SignTypeMethod {
 
 type StateType = {
   provider?: any;
+  signer?:any;
   web3Provider?: ethers.providers.Web3Provider | null;
   ethersProvider?: ethers.providers.Web3Provider | null;
   address?: string;
@@ -42,12 +46,13 @@ const initialState: StateType = {
   web3Provider: null,
   ethersProvider: null,
   address: "",
+  signer:null,
   chainId: activeChainId,
 };
 
 export const Web3AuthProvider = ({ children }: any) => {
   const [web3State, setWeb3State] = useState<StateType>(initialState);
-  const { provider, web3Provider, ethersProvider, address, chainId } =
+  const { provider, web3Provider, ethersProvider, address, chainId, signer } =
     web3State;
   const [loading, setLoading] = useState(false);
   const [socialLoginSDK, setSocialLoginSDK] = useState<SocialLogin | null>(
@@ -89,10 +94,12 @@ export const Web3AuthProvider = ({ children }: any) => {
         socialLoginSDK.provider
       );
       const signer = web3Provider.getSigner();
+    
       const gotAccount = await signer.getAddress();
       const network = await web3Provider.getNetwork();
       setWeb3State({
         provider: socialLoginSDK.provider,
+        signer:signer,
         web3Provider: web3Provider,
         ethersProvider: web3Provider,
         address: gotAccount,
@@ -170,6 +177,7 @@ export const Web3AuthProvider = ({ children }: any) => {
         connect,
         disconnect,
         loading,
+        signer:signer,
         provider: provider,
         ethersProvider: ethersProvider || null,
         web3Provider: web3Provider || null,

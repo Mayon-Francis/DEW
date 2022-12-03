@@ -7,12 +7,17 @@ import { useSmartAccountContext } from "./contexts/SmartAccountContext";
 import { useWeb3AuthContext } from "./contexts/SocialLoginContext";
 import { LoginType } from "./index.d";
 import { useLoginTypeContext } from "./contexts/LoginType";
+
+
+
+
 const App: React.FC = () => {
   const classes = useStyles();
-  const { connect, address, loading: eoaWalletLoading } = useWeb3AuthContext();
+  const { connect, address, loading: eoaWalletLoading, signer } = useWeb3AuthContext();
   const { loading } = useSmartAccountContext();
   const { loginType, setLoginTypeFromUser } = useLoginTypeContext();
   if (!address) {
+
     return (
       <div
         className={classes.bgCover}

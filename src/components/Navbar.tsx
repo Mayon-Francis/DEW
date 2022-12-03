@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppBar } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useWeb3AuthContext } from "../contexts/SocialLoginContext";
@@ -10,10 +10,12 @@ import {
   // showErrorMessage,
   // showSuccessMessage,
 } from "../utils";
+import {getContract} from "../utils/interact"
+
 
 const Navbar = () => {
   const classes = useStyles();
-  const { disconnect } = useWeb3AuthContext();
+  const { disconnect, signer} = useWeb3AuthContext();
   const {
     // getSmartAccount,
     loading,
@@ -37,6 +39,17 @@ const Navbar = () => {
     disconnect();
     setShowModal(false);
   };
+
+  const testEthers = async() =>{
+  let warranty =  await getContract(signer)
+  console.log(await warranty.name())
+  }
+
+  useEffect(()=>{
+   if(signer){
+     testEthers()
+   }
+  }, [signer])
 
   return (
     <AppBar position="static" classes={{ root: classes.nav }}>
