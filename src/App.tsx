@@ -5,13 +5,13 @@ import Navbar from "./components/Navbar";
 import TabsBody from "./components/TabsBody";
 import { useSmartAccountContext } from "./contexts/SmartAccountContext";
 import { useWeb3AuthContext } from "./contexts/SocialLoginContext";
-import Button from "./components/Button";
-
+import { LoginType } from "./index.d";
+import { useLoginTypeContext } from "./contexts/LoginType";
 const App: React.FC = () => {
   const classes = useStyles();
   const { connect, address, loading: eoaWalletLoading } = useWeb3AuthContext();
   const { loading } = useSmartAccountContext();
-
+  const { loginType, setLoginTypeFromUser } = useLoginTypeContext();
   if (!address) {
     return (
       <div
@@ -20,22 +20,60 @@ const App: React.FC = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          paddingTop: "30vh",
         }}
       >
-        <h1 className={classes.title}>Biconomy SDK Demo</h1>
-        <Button
-          title="Get Started"
-          onClickFunc={connect}
-          isLoading={eoaWalletLoading}
-          style={{
-            fontSize: 20,
-            padding: "30px 20px",
-            border: 0,
-            background:
-              "linear-gradient(90deg, #0063FF -2.21%, #9100FF 89.35%)",
-          }}
-        />
+        <h1 className={classes.title}>DEW</h1>
+        <h3 className={classes.subTitle}>Decentralised NFT</h3>
+        <div className={classes.cardWrapper}>
+          <div className={classes.individualCardWrapper}>
+            <div
+              className={classes.card}
+              onClick={() => {
+                setLoginTypeFromUser(LoginType.CUSTOMER);
+                connect();
+              }}
+            >
+              <span className={classes.cardTitle}>I'm a Customer</span>
+            </div>
+            <div className={classes.cardBlob}></div>
+          </div>
+          <div className={classes.individualCardWrapper}>
+            <div
+              className={classes.card}
+              onClick={() => {
+                setLoginTypeFromUser(LoginType.RETAILER);
+                connect();
+              }}
+            >
+              <span className={classes.cardTitle}>I'm a Retailer</span>
+            </div>
+            <div
+              className={classes.cardBlob}
+              style={{
+                background:
+                  "radial-gradient(81.25% 81.25% at 67.32% 18.75%, #17B3A9 0%, #0945DF 100%)",
+              }}
+            ></div>
+          </div>
+          <div className={classes.individualCardWrapper}>
+            <div
+              className={classes.card}
+              onClick={() => {
+                setLoginTypeFromUser(LoginType.COMPANY);
+                connect();
+              }}
+            >
+              <span className={classes.cardTitle}>We're a Company</span>
+            </div>
+            <div
+              className={classes.cardBlob}
+              style={{
+                background:
+                  "radial-gradient(76.75% 76.75% at 70% 23.25%, #72047B 0%, #6709DF 100%)",
+              }}
+            ></div>
+          </div>
+        </div>
         <ToastContainer />
       </div>
     );
@@ -75,11 +113,67 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
   },
   title: {
-    marginBottom: 50,
+    marginBottom: 0,
     fontSize: 60,
     background: "linear-gradient(90deg, #12ECB8 -2.21%, #00B4ED 92.02%)",
     "-webkit-background-clip": "text",
     "-webkit-text-fill-color": "transparent",
+  },
+  subTitle: {
+    fontSize: 20,
+    fontWeight: 800,
+    color: "#fff",
+  },
+  cardWrapper: {
+    display: "flex",
+    padding: "2rem",
+    gap: "5rem",
+    marginBottom: 50,
+    cursor: "pointer",
+  },
+  individualCardWrapper: {
+    position: "relative",
+  },
+  card: {
+    width: "250px",
+    height: "350px",
+    zIndex: 2,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "background 0.8s ease-in-out",
+    background:
+      "linear-gradient(152.97deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%)",
+    "&:hover": {
+      background: "linear-gradient(90deg, #0063FF -2.21%, #9100FF 89.35%)",
+    },
+    backdropFilter: "blur(21px)",
+    borderRadius: "16px",
+    position: "relative",
+    isolation: "isolate",
+  },
+  cardBlob: {
+    content: "''",
+    width: "206.83px",
+    height: "206.83px",
+    background:
+      "radial-gradient(76.75% 76.75% at 70% 23.25%, #E7CE4A 0%, #E64467 100%)",
+    transform: "rotate(-0.42deg)",
+    borderRadius: "50%",
+    position: "absolute",
+    bottom: "-100px",
+    right: "100px",
+    zIndex: 1,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: 600,
+    lineHeight: "24px",
+    textAlign: "center",
+    letterSpacing: "0.1em",
+    textTransform: "uppercase",
+    color: "#FFFFFF",
   },
   animateBlink: {
     animation: "$bottom_up 2s linear infinite",
