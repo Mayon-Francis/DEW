@@ -95,9 +95,9 @@ function App() {
         aria-label="Vertical tabs"
         className={classes.tabs}
       >
-        <Tab label="Onboarding" {...a11yProps(0)} />
-        <Tab label="Assets" {...a11yProps(1)} />
-        <Tab label="Use Cases" {...a11yProps(2)} />
+        <Tab label="My Products" {...a11yProps(0)} />
+        <Tab label="Coming soon.." {...a11yProps(1)} />
+        <Tab label="Coming soon.." {...a11yProps(2)} />
       </Tabs>
 
       <TabPanel value={value} index={0}>

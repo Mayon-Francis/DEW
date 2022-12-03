@@ -41,7 +41,7 @@ const Navbar = () => {
   return (
     <AppBar position="static" classes={{ root: classes.nav }}>
       <div className={classes.flexContainer}>
-        <img src="img/logo.svg" alt="logo" className={classes.logo} />
+        <img src="img/logo.png" alt="logo" className={classes.logo} />
         <div className={classes.walletBtnContainer}>
           {selectedAccount?.smartAccountAddress && (
             <p className={classes.btnTitle}>Smart Account Address</p>
@@ -129,7 +129,7 @@ const useStyles = makeStyles((theme: any) => ({
     width: "90%",
   },
   logo: {
-    height: "25px",
+    height: "60px",
     marginTop: 2,
   },
   walletBtnContainer: {

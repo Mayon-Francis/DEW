@@ -39,25 +39,24 @@ const Onboarding: React.FC<OnboardingProps> = ({ setValue }) => {
         getEOAWallet(process.env.REACT_APP_PKEY || "", null)
       );
 
-      console.log('relayer');
+      console.log("relayer");
       console.log(relayer);
       const context = smartAccount.getSmartAccountContext();
 
-      try{
-      const deployment = await relayer.deployWallet({
-        config: state,
-        context,
-        index: 0,
-      }); // index 0
+      try {
+        const deployment = await relayer.deployWallet({
+          config: state,
+          context,
+          index: 0,
+        }); // index 0
 
-      const res = await deployment.wait(1);
-      console.log(res);
-    } catch(err) {
-      console.log('fails here')
-      console.log(err)
-    }
-      
-      
+        const res = await deployment.wait(1);
+        console.log(res);
+      } catch (err) {
+        console.log("fails here");
+        console.log(err);
+      }
+
       getSmartAccount();
       showSuccessMessage("Smart Account deployed");
       setDeployLoading1(false);
@@ -77,7 +76,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ setValue }) => {
       setDeployLoading2(true);
       const relayer = new RestRelayer({
         url: "https://sdk-relayer.staging.biconomy.io/api/v1/relay",
-        socketServerUrl: 'wss://sdk-testing-ws.staging.biconomy.io/connection/websocket'
+        socketServerUrl:
+          "wss://sdk-testing-ws.staging.biconomy.io/connection/websocket",
       });
       smartAccount.setRelayer(relayer);
 
@@ -109,37 +109,38 @@ const Onboarding: React.FC<OnboardingProps> = ({ setValue }) => {
 
   return (
     <main className={classes.main}>
-      <h3 className={classes.subTitle}>{"Deploy Smart Account"}</h3>
+      <h3 className={classes.subTitle}>{"Your Registered Products"}</h3>
       <p>
-        Welcome onboard! This is the demo of the new Biconomy SDK. You need to
-        deploy your smart account wallet to get started.
+        Welcome onboard! These are the products that you have registered with
+        us.
       </p>
-      <p style={{ marginBottom: 25 }}>Wallet Deployment → </p>
+      <p style={{ marginBottom: 25 }} className={classes.smallLink}>
+        Dont see you product here? →{" "}
+      </p>
       {state?.isDeployed ? (
-        <div className={classes.container2}>
-          <p className={classes.text} style={{ marginBottom: 30 }}>
-            Your Smart Account is already created.
-          </p>
-          <Button
-            title="Go to Use Cases"
-            isLoading={deployLoading1}
-            onClickFunc={() => setValue(2)}
-          />
-        </div>
+        ""
       ) : (
+        // <div className={classes.container2}>
+        //   <p className={classes.text} style={{ marginBottom: 30 }}>
+        //     Your Smart Account is already created.
+        //   </p>
+        //   <Button
+        //     title="Go to Use Cases"
+        //     isLoading={deployLoading1}
+        //     onClickFunc={() => setValue(2)}
+        //   />
+        // </div>
         <div className={classes.container}>
           <div className={classes.element}>
-            <p className={classes.text}>
-              Demo dapp pays for the wallet deployment cost.
-            </p>
+            <p className={classes.text}>Acer Nitro 5 Gaming Laptop</p>
             <ul style={{ width: "100%" }}>
-              <li style={{ marginBottom: 20 }}>Single click deployment.</li>
               <li style={{ marginBottom: 20 }}>
-                Relayers deploys / funds the wallet deployment for you.
+                9th Gen Intel Core i5-9300H, NVIDIA.
               </li>
+              <li style={{ marginBottom: 20 }}>Model Number: AN515-54-5812</li>
             </ul>
             <Button
-              title="Deploy Smart Account"
+              title="View Warranty"
               isLoading={deployLoading1}
               onClickFunc={deploySmartAccount1}
             />
@@ -195,8 +196,15 @@ const useStyles = makeStyles(() => ({
   },
   subTitle: {
     fontFamily: "Rubik",
-    color: "#fff",
+    color: "#fff70",
     fontSize: 28,
+  },
+  smallLink: {
+    "&:hover": {
+      cursor: "pointer",
+      color: "#fff",
+      textDecoration: "underline",
+    },
   },
   container: {
     width: "100%",
