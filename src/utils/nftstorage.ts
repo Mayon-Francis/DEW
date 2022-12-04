@@ -14,7 +14,7 @@ async function getExampleImage() {
   return r.blob()
 }
 
-async function storeExampleNFT() {
+export async function storeExampleNFT() {
   const image = await getExampleImage()
   const nft = {
     image, // use image Blob as `image` field
@@ -33,11 +33,10 @@ async function storeExampleNFT() {
     }
   }
 
-  const client = new NFTStorage({ token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERhNWQwQjU0NWFiRDcyMGJhMzk2MDdlMWQwNTFjODQzRTg1YmMzQjkiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3MDEyMTYyMjYzMywibmFtZSI6IndhcnJhbnR5In0.HUj5E-thJqKl2KLzAGAyCtNCNILtQzdl0ONsgQ01-xc })
+  const client = new NFTStorage({ token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweERhNWQwQjU0NWFiRDcyMGJhMzk2MDdlMWQwNTFjODQzRTg1YmMzQjkiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY3MDEyMTYyMjYzMywibmFtZSI6IndhcnJhbnR5In0.HUj5E-thJqKl2KLzAGAyCtNCNILtQzdl0ONsgQ01-xc' })
   const metadata = await client.store(nft)
 
   console.log('NFT data stored!')
   console.log('Metadata URI: ', metadata.url)
 }
 
-storeExampleNFT()
