@@ -89,7 +89,7 @@ const App: React.FC = () => {
       <Navbar />
       {loading ? (
         <div className={classes.container}>
-          <img src="/logo.svg" className={classes.animateBlink} alt="" />
+          <img src="/img/logo.png" className={classes.animateBlink} alt="" />
         </div>
       ) : (
         <TabsBody />
@@ -181,6 +181,7 @@ const useStyles = makeStyles(() => ({
     color: "#FFFFFF",
   },
   animateBlink: {
+    height: "100px",
     animation: "$bottom_up 2s linear infinite",
     "&:hover": {
       transform: "scale(1.2)",

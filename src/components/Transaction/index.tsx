@@ -8,11 +8,11 @@ import {
   Grid,
   Typography,
   TextField,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
+//   FormControl,
+//   FormLabel,
+//   RadioGroup,
+//   FormControlLabel,
+//   Radio,
   Button,
   Container,
 } from "@material-ui/core";
@@ -21,8 +21,8 @@ import {
   ThemeProvider,
   makeStyles,
 } from "@material-ui/core/styles";
-import {  orange } from '@material-ui/core/colors';
-// import { useState } from "react";
+import { orange } from "@material-ui/core/colors";
+import { useState } from "react";
 
 // ***********
 
@@ -53,6 +53,7 @@ console.log("biconomy", biconomy);
 
 biconomy.on("txMined", (data: any) => {
   console.log("transaction data TXMINED", data);
+  alert("Transaction Mined, Hash: " + data.hash);
 });
 biconomy.on("txHashGenerated", (data: any) => {
   console.log("transaction data TXHASH GENERATED", data);
@@ -84,76 +85,88 @@ const theme = createTheme({
 
 const useStyles = makeStyles({
   textField: {
-//     color: "#fff",
-//     borderColor: "#fff",
-//     "&::placeholder": {
-//       color: "#fff",
-//     },
+    //     color: "#fff",
+    //     borderColor: "#fff",
+    //     "&::placeholder": {
+    //       color: "#fff",
+    //     },
   },
 });
 
-
-async function initialise() {
-  console.log("initialising");
-  await biconomy.init();
-  console.log("biconomy initialised");
-  const provider = await biconomy.provider;
-
-  const contract = new ethers.Contract(
-    contractAddress,
-    contractAbi,
-    biconomy.ethersProvider
-  );
-  console.log("contract", contract);
-
-  const { data } = await contract.populateTransaction.mint(
-    "serialNumber",
-    "uri",
-    true,
-    10,
-    1000000
-  );
-
-  const userAddress = await biconomy.signer?.getAddress();
-  console.log("userAddress", userAddress);
-  let txParams = {
-    data: data,
-    to: contractAddress,
-    from: userAddress,
-    signatureType: "PERSONAL_SIGN",
-  };
-  if (provider.send) {
-    console.log("SENDING TX");
-    provider.send(
-      {
-        method: "eth_sendTransaction",
-        params: [txParams],
-      },
-      (err: any, res: any) => {
-        console.log("err", err);
-        console.log("res", res);
-      }
-    );
-  }
-}
-
-
 function Transaction(props: any) {
   const classes = useStyles();
+  const [contract, setContract] = useState<any>(false);
+  const [serialNum, setSerialNum] = useState<any>("");
+
+  async function initialise() {
+    console.log("initialising");
+    await biconomy.init();
+    console.log("biconomy initialised");
+
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractAbi,
+      biconomy.ethersProvider
+    );
+    setContract(contract);
+  }
+
+  async function mint() {
+    if(!contract) {
+        alert("Contract not initialised, please wait");
+        return;
+    }
+    const { data } = await contract.populateTransaction.mint(
+      serialNum,
+      "uri",
+      true,
+      10,
+      1000000
+    );
+
+    const userAddress = await biconomy.signer?.getAddress();
+    const provider = biconomy.provider;
+    console.log("userAddress", userAddress);
+    let txParams = {
+      data: data,
+      to: contractAddress,
+      from: userAddress,
+      signatureType: "PERSONAL_SIGN",
+    };
+    if (provider.send) {
+      console.log("SENDING TX");
+      provider.send(
+        {
+          method: "eth_sendTransaction",
+          params: [txParams],
+        },
+        (err: any, res: any) => {
+          console.log("err", err);
+          console.log("res", res);
+        }
+      );
+    }
+  }
 
   useEffect(() => {
+    initialise();
   }, []);
   return (
     <ThemeProvider theme={theme}>
       <Container
         style={{
           width: "60vw",
-          marginTop: "200px",
+          marginTop: "150px",
           background:
             "linear-gradient(152.97deg, rgba(255, 255, 255, 0.2) 80%, rgba(255, 255, 255, 0) 100%)",
         }}
       >
         <Grid container spacing={2}>
+          <Grid item xs={12} style={{ textAlign: "center" }}>
+            <Typography variant="h4" gutterBottom data-aos="fade-left">
+              Enter Product Details
+            </Typography>
+          </Grid>
           <Grid item xs={4}>
             <Typography variant="subtitle1" gutterBottom data-aos="fade-left">
               Brand
@@ -172,7 +185,7 @@ function Transaction(props: any) {
 
           <Grid item xs={4}>
             <Typography variant="subtitle1" gutterBottom data-aos="fade-left">
-              Model Number
+              Serial Number
             </Typography>
           </Grid>
           <Grid item xs={8}>
@@ -182,10 +195,12 @@ function Transaction(props: any) {
               label="AB12-38xxxxx"
               variant="outlined"
               fullWidth
+              value={serialNum}
+                onChange={(e) => setSerialNum(e.target.value)}
             />
           </Grid>
 
-          <Grid item xs={4}>
+          {/* <Grid item xs={4}>
             <Typography variant="subtitle1" gutterBottom data-aos="fade-left">
               Is your product still under warranty?
             </Typography>
@@ -229,27 +244,30 @@ function Transaction(props: any) {
                 />
               </RadioGroup>
             </FormControl>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={4}>
             <Typography variant="subtitle1" gutterBottom data-aos="fade-left">
-              Describe physical condition
+              Remarks
             </Typography>
           </Grid>
           <Grid item xs={8}>
             <TextField data-aos="fade-right" multiline fullWidth />
           </Grid>
 
-          <Grid item xs={11}>
-            <Button variant="contained" onClick={initialise}>MINT</Button>
+          <Grid item xs={11} style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center"
+          }}>
+            <Button variant="contained" onClick={mint}>
+              MINT
+            </Button>
           </Grid>
         </Grid>
         <Grid item xs={8}>
           <TextField data-aos="fade-right" multiline fullWidth />
         </Grid>
-        {/* <Grid item xs={8}>
-     <input type="file" onChange={(e)=>{setPhoto(e.target.files[0])}}/>
-    </Grid> */}
       </Container>
     </ThemeProvider>
   );

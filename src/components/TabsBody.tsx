@@ -97,8 +97,8 @@ function App() {
         className={classes.tabs}
       >
         <Tab label="My Products" {...a11yProps(0)} />
-        <Tab label="Coming soon.." {...a11yProps(1)} />
-        <Tab label="Coming soon.." {...a11yProps(2)} />
+        <Tab disabled label="Coming soon.." {...a11yProps(1)} />
+        <Tab disabled label="Coming soon.." {...a11yProps(2)} />
       </Tabs>
 
       <TabPanel value={value} index={0}>
