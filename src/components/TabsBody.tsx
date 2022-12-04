@@ -8,6 +8,7 @@ import Tab from "@material-ui/core/Tab";
 import Onboarding from "./Onboarding/index";
 import Assets from "./Assets/index";
 import UseCases from "./UseCases/index";
+import Transaction from "./Transaction";
 
 function TabPanel(props: any) {
   const classes = useStyles();
@@ -101,7 +102,8 @@ function App() {
       </Tabs>
 
       <TabPanel value={value} index={0}>
-        <Onboarding setValue={setValue} />
+        <Transaction />
+        {/* <Onboarding setValue={setValue} /> */}
       </TabPanel>
 
       <TabPanel value={value} index={1}>
