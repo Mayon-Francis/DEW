@@ -146,6 +146,7 @@ function Transaction(props: any) {
         }
       );
     }
+  
   }
 
   useEffect(() => {
